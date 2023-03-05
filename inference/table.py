@@ -14,7 +14,7 @@ actions = ["Directions","Discussion","Eating","Greeting",
 img_mean = np.array([123.675,116.280,103.530])
 img_std = np.array([58.395,57.120,57.375])
 
-flip_pairs = np.array([[1, 4], [2, 5], [3, 6], [14, 11], [15, 12], [16, 13]], dtype=np.int)
+flip_pairs = np.array([[1, 4], [2, 5], [3, 6], [14, 11], [15, 12], [16, 13]], dtype=np.intc)
 
 JOINT_CONNECTIONS = [[1, 0], [4, 0], [7, 0],
                      [2,1], [3,2],

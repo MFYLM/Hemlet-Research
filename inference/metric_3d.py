@@ -145,7 +145,7 @@ def invPoseToCamSpacePlus(cropPose3d,jointRoot,camID,trans):
 
 def eval_metric(pred_joint3d_numpy,pred_joint3d_filp_numpy,gt_joint3d_numpy,camid_numpy,\
         trans_numpy,joint_root_numpy,gt_joint3d_j18_numpy,seqJsonDict=None,debug = False,return_viz_joints=False):
-    
+
     pred_joint3d_numpy_crop = from_normjoint_to_cropspace(pred_joint3d_numpy)
     gt_joint3d_numpy_crop = from_normjoint_to_cropspace(gt_joint3d_numpy)
     pred_filp_joint3d_numpy_crop = from_normjoint_to_cropspace(pred_joint3d_filp_numpy)
@@ -172,6 +172,8 @@ def eval_metric(pred_joint3d_numpy,pred_joint3d_filp_numpy,gt_joint3d_numpy,cami
         
         # restore the predicted camera spcae 3D joints
         pred_cam3d_unity,_,_ = invPoseToCamSpacePlus(mixJoint,joint_root_numpy[i],-1,trans_numpy[i])
+
+        
         # protocol #1 & #2
         protocol_1m,protocol_2m = MPJPE_P1_P2(gt_cam3d_j18,pred_cam3d_unity)
 

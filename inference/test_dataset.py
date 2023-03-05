@@ -48,13 +48,17 @@ class H36M(tData.Dataset):
         with h5py.File(h5_path,'r') as db:
 
             joints3dCam = db['joints3d_cam'][idx] # load the camera space 3d joint (32,3)
+            # print(joints3dCam)
+            # print(joints3dCam.shape)
             joint3d_j18 = np.zeros((18,3),dtype=float)
-            joint3d_j18[0:17,:] = joints3dCam[H36M_TO_J18,:] 
+            joint3d_j18[0:17,:] = joints3dCam[H36M_TO_J18,:]
             joint3d_j18[17] = (joint3d_j18[11] + joint3d_j18[14]) * 0.5 
 
 
             img = db['images'][idx]
+
             joints = db['joints'][idx]
+
             
             trans = db['trans'][idx]
             camid = db['camid'][idx]
@@ -80,6 +84,42 @@ class H36M(tData.Dataset):
 
             
             return image,image_filp,trans,cam_id,joint3d,joint3d_j18,np.zeros((3),dtype=float),'subject_{}'.format(self.subject)
+
+
+# class GPA(tData.Dataset):
+#     def __init__(self,h5_path,video_id=1,subject=11,patch_width=256,patch_height=256,split = 'train'):
+#         super(GPA,self).__init__()
+
+#         self.subject = subject
+
+#         self.h5_path = h5_path
+
+#         self.video_id = video_id
+
+
+#         with h5py.File(self.h5_path,'r') as db:
+#             self.len_data = db['images'].shape[0]
+
+#         print(self.len_data)
+
+#     def __len__(self):
+#         return self.len_data
+
+#     def imgNormalize(self, img):
+#         return np.divide(img - img_mean, img_std)
+    
+
+#     def __getitem__(self, index):
+#         h5_path =  self.h5_path
+
+#         idx = index % self.__len__()
+#         with h5py.File(h5_path,'r') as db:
+#             pass
+
+
+
+
+
 if __name__ == '__main__':
     d = H36M(split = 'val')
     for _ in range(100):

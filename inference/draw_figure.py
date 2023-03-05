@@ -19,6 +19,7 @@ def drawArrow(img, pStart, pEnd, alen, alpha, color, thickness, lineType=None):
 	cv2.line(img,(int(arrowP[0]),int(arrowP[1])),(int(arrow_x),int(arrow_y)),color=color,thickness=thickness,lineType=lineType)
 
 def drawSkeleton(img,joints,cons,cons_color,winName = 'img'):
+    print(img.shape)
     for idx, joint in enumerate(joints):
         x = int(joint[0])
         y = int(joint[1])
@@ -29,7 +30,7 @@ def drawSkeleton(img,joints,cons,cons_color,winName = 'img'):
         else:
             cv2.circle(img,(x,y),3,(0,128,0),-1)
     edge_color_dict = {0:(0,0,255),1:( 0,255,0),2:(255,0,0)}
-    for idx,edge in enumerate(cons) :
+    for idx,edge in enumerate(cons):
         i = edge[0]
         j = edge[1]
         joint_i = joints[i]
@@ -49,7 +50,7 @@ def Draw3DSkeleton(channels,ax,edge,Name=None,fontdict=None,j18_color  = None,im
     edge = np.array(edge)
     I    = edge[:,0]
     J    = edge[:,1]
-    LR  = np.ones((edge.shape[0]),dtype=np.int)
+    LR  = np.ones((edge.shape[0]),dtype=np.int64)
     colors = [(0,0,1.0),(0,1.0,0),(1.0,0,0)]
     vals = np.reshape( channels, (-1, 3) )
 

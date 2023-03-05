@@ -1,0 +1,14 @@
+# ignore all directories with the name "" and all its contents
+**/GPA/*
+**/GPA_dataset/*
+
+
+*.jpg
+*.npz
+*.png
+*.mp4
+*.pth
+*.h5
+*.json
+*.pkl
+

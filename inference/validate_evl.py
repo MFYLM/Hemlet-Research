@@ -70,7 +70,7 @@ def validate(model, val_loader, device,  subject=9,visualize = False):
     # if os.path.exists(result_pics_path) is False:
     #     os.mkdir(result_pics_path)
 
-    N_viz = val_loader.__len__() 
+    N_viz = val_loader.__len__()
     idx_list = []
     for idx, data in enumerate(val_loader):
         if idx >= N_viz:
@@ -168,7 +168,7 @@ def validate(model, val_loader, device,  subject=9,visualize = False):
                 ax_mpjpe.plot(idx_list,protocol_1_list,color='b',label='Protocol #1')
                 ax_mpjpe.plot(idx_list,protocol_2_list,color='g',label='Protocol #2')
 
-            plt.draw()             
+            plt.draw()
             plt.pause(0.01)
             
             if idx == N_viz-1:
@@ -196,7 +196,7 @@ def validate(model, val_loader, device,  subject=9,visualize = False):
                                                         quality=8,
                                                         
                                                         ffmpeg_timeout=0,       # libx264 in default
-                                                        macro_block_size=1) 
+                                                        macro_block_size=1)
                 vw_pure.send( None )
 
             # convert BGR to RGB 
@@ -236,6 +236,11 @@ if __name__ == '__main__':
                         default=11, \
                         help='evaluation sequence id of the testing dataset')
 
+    # process GPA arguments
+    # parser.add_argument("--gpa_path", type=str, \
+    #                     default="./GPA/Gaussian_cropped_images", \
+    #                     help="path to GPA dataset")
+
     argspar = parser.parse_args()
     print('argspar',argspar)
 
@@ -248,10 +253,13 @@ if __name__ == '__main__':
     # define network 
     model = Network(config)
     # device = torch.device('cpu')
-    device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
+    device = torch.device('cuda:3') if torch.cuda.is_available() else torch.device('cpu')
+    # print(torch.cuda.current_device())
+    #print(torch.cuda.memory_summary(device=device, abbreviated=False))
+    # torch.cuda.empty_cache()
     model = model.to(device)
 
-
+    # gpa_dataset = argspar.gpa_path
     checkpoint_path = argspar.ckpt_path # './ckpt/hemlets_lastest.pth'
     tiny_dataset = argspar.dataset_path  #'./data/S11/S_11_C_4_1_full.h5'
     print('tiny_dataset',tiny_dataset)
