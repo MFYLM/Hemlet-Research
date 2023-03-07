@@ -57,6 +57,8 @@ class H36M(tData.Dataset):
 
             img = db['images'][idx]
 
+            # print(type(img))
+
             joints = db['joints'][idx]
 
             
