@@ -34,6 +34,7 @@ class dpw(tData.Dataset):
         self.singleJoints = [] # only works for single subject
         self.ground_truth_coordinate = []
         self.all_boundaries = []
+        self.trans = []
         self.loadAllImageAndBoxes()
         
     def __len__(self):
@@ -75,6 +76,8 @@ class dpw(tData.Dataset):
         intrinsic = data['cam_intrinsics']
         valid_data = data["campose_valid"]
         subjects = data['jointPositions']
+        currenTrain = data["trans"]
+        # self.trans.append(data["trans"])
         f = np.array([intrinsic[0, 0], intrinsic[1, 1]]).reshape((2, 1))
         c = np.array(intrinsic[:2, 2]).reshape((2, 1))
         jnts_2d = []
@@ -117,6 +120,7 @@ class dpw(tData.Dataset):
                 pixel_2d = f[:, 0] * proj_2d + c[:, 0]
                 jnts_2d[i_sub].append(pixel_2d)
                 self.singleJoints[i_sub].append(pos3d_cam)
+                self.trans.append(currenTrain[0][i_frame])
                 cur_sub +=1
             checker.append(cur_sub)
             # self.singleJoints[i_sub] = np.array(self.singleJoints[i_sub])
@@ -169,7 +173,7 @@ class dpw(tData.Dataset):
         image_filp = image[:,:,::-1].copy()
         image_filp = torch.from_numpy(image_filp).float()
         image = torch.from_numpy(image).float()
-        return image, image_filp, img, np.array(self.singleJoints[0][index])
+        return image, image_filp, img, np.array(self.singleJoints[0][index]),self.trans[index]
 
 if __name__ == '__main__':
     seq_path =  "C:/Users/LangZheZR/Desktop/Research/sequenceFiles/sequenceFiles/test"

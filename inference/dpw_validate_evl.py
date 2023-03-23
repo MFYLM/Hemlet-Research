@@ -74,11 +74,11 @@ def move_hip_to_origin_dpw(pose):
         poseNew[i,:] = pose[i,:] - rootPos
     return  poseNew
 
-def normalized_to_original(image):
-    image_numpy = image.cpu().numpy()
-    image_numpy = np.transpose(image_numpy, (0, 2, 3, 1))
-    image_numpy = image_numpy * img_std + img_mean
-    return image_numpy.astype(np.uint8)
+# def normalized_to_original(image):
+#     image_numpy = image.cpu().numpy()
+#     image_numpy = np.transpose(image_numpy, (0, 2, 3, 1))
+#     image_numpy = image_numpy * img_std + img_mean
+#     return image_numpy.astype(np.uint8)
 
 def from_normjoint_to_cropspace(joint3d):
     joint3d[:,:,:2] = (joint3d[:,:,:2] + 0.5 )*256.0
@@ -120,6 +120,18 @@ def DrawGTSkeleton(channels,ax):
 
     # for i in range(14):
     #     ax.plot([vals[i,0],vals[i,0]+1],[-vals[i,2],-vals[i,2]],[vals[i,1],vals[i,1]],lw=3,c=(0.0,0.8,0.0))	
+
+def cropPoseToFullPose(cropPose,trans):
+    fullPose = cropPose.copy()
+    fullPose = fullPose / trans[2]
+    fullPose[:,0] = fullPose[:,0] + trans[0]
+    fullPose[:,1] = fullPose[:,1] + trans[1]
+    return fullPose
+    
+def dpw_invPoseToCamSpacePlus(mixjoint, trans_np):
+    fullPose2d = cropPoseToFullPose(mixjoint[:,0:2],trans_np)
+    j3d = restore_cameraspace_3d_joints(fullPose2d,mixjoint[:,2]  * 2000.0)
+    return j3d,j3d,fullPose2d
     
 def dpw_validate(model, val_loader, device):
     
@@ -141,35 +153,30 @@ def dpw_validate(model, val_loader, device):
     for idx, data in enumerate(val_loader):
         if idx>=N_viz:
             break
-        image, image_flip, original_img, true_joint = data
+        image, image_flip, original_img, true_joint, trans = data
         image = image.to(device)
         with torch.no_grad():
             pred_joint3d = model(image,val= True)
             pred_joint3d_flip = model(image_flip,val=True)
-        
-        print("predicted 3d: ",pred_joint3d[0][joint14_HEMlet_index,:]*10, " shape of 3d: ", np.shape(pred_joint3d[0][joint14_HEMlet_index,:]*10))
         
         
         pre_3d_np = pred_joint3d.cpu().numpy()
         pre_3d_flip_np = pred_joint3d_flip.cpu().numpy()
         pred_crop_3d_joint = dpw_eval_matric(pre_3d_np,pre_3d_flip_np)
         Draw3DSkeleton(pred_crop_3d_joint,axPose3d_pred,JOINT_CONNECTIONS,'Pred_joint3d',fontdict=font,j18_color=JOINT_COLOR_INDEX,image = None)
-        # original_img = image.detach().cpu().numpy()[0]
-        # original_img = np.transpose(original_img,(1,2,0))
-        # print("image size is: ",np.shape(original_img)," type of imageis: ",type(original_img))
         axImg.imshow(original_img[0])
         axImg.axis('off')
         
         # show the scatter of true_joint_position 
         print("Shape of number of joint: ",true_joint[0]," shape of true: ", np.shape(true_joint[0]))
-        # print("True jointns: ", pred_crop_3d_joint)
         DrawGTSkeleton(true_joint[0],ax_true_pose)
         
-        # prepare for comparison:
-        scaled_pre_3d = pre_3d_np[0][joint14_HEMlet_index,:]*10
-        error = MPJPE_P1_P2_dpw(scaled_pre_3d,true_joint[0])
-        print("the euclidean distance: " ,error)
-        
+        pred_cam3d_unity,_,_ = dpw_invPoseToCamSpacePlus(pred_crop_3d_joint,trans[0].cpu().numpy())
+        error = MPJPE_P1_P2_dpw(pred_cam3d_unity[joint14_HEMlet_index,:],true_joint[0])
+        print("########################################")
+        print("####the euclidean distance: " ,error)
+        print("########################################")
+
         
         plt.draw()
     
