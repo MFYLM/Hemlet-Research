@@ -19,7 +19,6 @@ def drawArrow(img, pStart, pEnd, alen, alpha, color, thickness, lineType=None):
 	cv2.line(img,(int(arrowP[0]),int(arrowP[1])),(int(arrow_x),int(arrow_y)),color=color,thickness=thickness,lineType=lineType)
 
 def drawSkeleton(img,joints,cons,cons_color,winName = 'img'):
-    print(img.shape)
     for idx, joint in enumerate(joints):
         x = int(joint[0])
         y = int(joint[1])

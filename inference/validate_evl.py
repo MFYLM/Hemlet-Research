@@ -104,7 +104,7 @@ def validate(model, val_loader, device,  subject=9,visualize = False):
         # transform matrix between the croppred (256*256) and org image (1000*1000)
         trans_numpy = trans.numpy()
         # abs joint root 
-        joint_root_numpy = [None] 
+        joint_root_numpy = [None]
 
         
 
